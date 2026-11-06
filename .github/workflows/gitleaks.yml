@@ -31,7 +31,7 @@ jobs:
       - name: Scan repository and enforce threshold
         run: |
           # 1. Scan complet de l'historique (--exit-code 0 pour ne pas casser le step avant le calcul)
-          gitleaks detect --source . --log-opts='--all' --redact --verbose --report-format json --report-path gitleaks-report.json --exit-code 0
+          gitleaks detect --source . --log-opts='--all' --redact --verbose --report-format json --report-path gitleaks-report.json --exit-code 1
 
           # Vérification de la présence du rapport
           if [ ! -f gitleaks-report.json ] || [ ! -s gitleaks-report.json ]; then
