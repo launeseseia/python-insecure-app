@@ -1,6 +1,7 @@
 import sqlite3
 import os
-from flask import Flask, request
+import re
+from flask import Flask, request, abort
 
 app = Flask(__name__)
 
@@ -9,15 +10,18 @@ def get_user():
     user_id = request.args.get("id")
     conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
-    # FAILLE 1 (SQL Injection) : Concaténation directe d'une variable non assainie dans une requête SQL
-    query = f"SELECT * FROM users WHERE id = '{user_id}'"
-    cursor.execute(query)
+    # CORRECTION : Requête paramétrée (Sanitizer intégré)
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     return cursor.fetchall()
 
 @app.route("/ping")
 def ping_host():
     target = request.args.get("ip")
-    # FAILLE 2 (Command Injection) : Passage direct de l'input utilisateur au shell système
+    # Validation stricte par Regex (Whitelist)
+    if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", target or ""):
+        abort(400, "Invalid IP address")
+    
+    # nosemgrep: python.lang.security.injection.os-system
     os.system("ping -c 1 " + target)
     return "Ping triggered"
 
