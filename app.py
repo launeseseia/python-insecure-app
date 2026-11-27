@@ -1,5 +1,5 @@
 # app.py
-
+WEBHOOK_URL = "***REDACTED_SECRET***"
 
 
 def notify():
